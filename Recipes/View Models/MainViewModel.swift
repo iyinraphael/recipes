@@ -7,18 +7,31 @@
 
 import Foundation
 
-class MainViewModel {
+enum CategoryType: String, CaseIterable {
+    case starter = "Starter"
+    case pasta = "Pasta"
+    case dessert = "Dessert"
+    
+    static func allValues() -> [String] {
+               return self.allCases.map { $0.rawValue }
+           }
+}
+
+final class MainViewModel {
     private let networkService: NetworkService
+    private(set) var meals = [Meal]()
+    
+    weak var appCoordinator: AppCoordinator?
     
     init(networkService: NetworkService) {
         self.networkService = networkService
     }
-    
-    func getAll() async {
-        do {
-            let recipe = try await networkService.fetchMealCategory(urlRecipe: .filterURL, mealId: "Dessert")
-            print(recipe)
-        } catch let error {
+    func getAllMeals(category: CategoryType) async {
+        let result = await networkService.fetchMealCategory(urlRecipe: .filterURL, category: category.rawValue)
+        switch result {
+        case .success(let meals):
+            self.meals = meals.meals
+        case .failure(let error):
             print(error)
         }
     }

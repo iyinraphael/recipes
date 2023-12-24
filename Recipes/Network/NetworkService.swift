@@ -17,23 +17,23 @@ class NetworkService {
         return urlComponent?.url
     }
     
-    func fetchMealCategory(urlRecipe: URLRecipeType, mealId: String) async throws -> MealCategory {
-        let parameters = [URLQueryItem(name: "c", value: mealId)]
+    func fetchMealCategory(urlRecipe: URLRecipeType, category: String) async -> Result<MealCategory, RecipeError> {
+        var resource: (Data, URLResponse)?
+        let parameters = [URLQueryItem(name: "c", value: category)]
         let urlPath = urlRecipe.baseString
         guard let url = retrieveUrl(for: parameters, urlPath: urlPath) else {
-            throw RecipeError.otherError
+            return .failure(.otherError)
         }
-        let (data, response) = try await URLSession.shared.data(from: url)
-        
-        print(data)
-        
+        resource = try? await URLSession.shared.data(from: url)
+        guard let (data, response) = resource else {
+            return .failure(.noDataError)
+        }
         guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-            throw RecipeError.networkError
+            return .failure(.networkError)
         }
         guard let category = try? JSONDecoder().decode(MealCategory.self, from: data) else {
-            throw RecipeError.decodeError
+            return .failure(.decodeError)
         }
-        return category
+        return .success(category)
     }
-    
 }
