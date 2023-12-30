@@ -79,7 +79,6 @@ class MainViewCell: UICollectionViewCell {
             ]
         )
     }
-    
     func updateView(_ meal: Meal) async {
         nameLabel.text = meal.strMeal
         await mealImageView.loadImage(from: meal.strMealThumb)

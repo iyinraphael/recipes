@@ -90,7 +90,6 @@ class MainViewController: UIViewController {
             }
         }
     }
-    
     private func applySnapshot(from category: CategoryType) async {
         if let mainViewModel = mainViewModel {
             var snapshot = NSDiffableDataSourceSnapshot<CategoryType, Meal>()
@@ -103,5 +102,9 @@ class MainViewController: UIViewController {
 }
 
 extension MainViewController: UICollectionViewDelegate {
-    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let meal = mainViewModel?.meals[indexPath.row]
+        mainViewModel?.appCoordinator?.gotoDetailView()
+        
+       }
 }

@@ -27,7 +27,7 @@ final class MainViewModel {
         self.networkService = networkService
     }
     func getAllMeals(category: CategoryType) async {
-        let result = await networkService.fetchMealCategory(urlRecipe: .filterURL, category: category.rawValue)
+        let result = await networkService.fetchMealCategory(category: category.rawValue)
         switch result {
         case .success(let meals):
             self.meals = meals.meals

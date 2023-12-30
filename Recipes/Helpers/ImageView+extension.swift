@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 extension UIImageView {
     func loadImage(from imageStr: String) async {

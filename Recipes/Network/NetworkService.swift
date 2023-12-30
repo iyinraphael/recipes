@@ -8,6 +8,9 @@
 import Foundation
 
 class NetworkService {
+    // MARK: - Private
+    private var resource: (Data, URLResponse)?
+
     private func retrieveUrl(for parameters: [URLQueryItem], urlPath: String ) -> URL? {
         guard let baseURL = URL(string: urlPath) else { return nil }
 
@@ -17,10 +20,9 @@ class NetworkService {
         return urlComponent?.url
     }
     
-    func fetchMealCategory(urlRecipe: URLRecipeType, category: String) async -> Result<MealCategory, RecipeError> {
-        var resource: (Data, URLResponse)?
-        let parameters = [URLQueryItem(name: "c", value: category)]
-        let urlPath = urlRecipe.baseString
+    private func fetchAPI<T>(from url: URLSearchType, with parameter: URLQueryItem) async -> Result<T, RecipeError> where T: Decodable {
+        let parameters = [parameter]
+        let urlPath = url.baseString
         guard let url = retrieveUrl(for: parameters, urlPath: urlPath) else {
             return .failure(.otherError)
         }
@@ -31,9 +33,20 @@ class NetworkService {
         guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
             return .failure(.networkError)
         }
-        guard let category = try? JSONDecoder().decode(MealCategory.self, from: data) else {
+        guard let result = try? JSONDecoder().decode(T.self, from: data) else {
             return .failure(.decodeError)
         }
-        return .success(category)
+        return .success(result)
+        
+    }
+    // MARK: - Internal
+    func fetchMealCategory(category: String) async -> Result<MealCategory, RecipeError> {
+        let parameter = URLQueryItem(name: "c", value: category)
+        return await fetchAPI(from: .filterURL, with: parameter)
+    }
+    
+    func fetctRecipes(mealID: String) async -> Result<Recipe, RecipeError> {
+        let parameter = URLQueryItem(name: "i", value: mealID)
+        return await fetchAPI(from: .idURL, with: parameter)
     }
 }

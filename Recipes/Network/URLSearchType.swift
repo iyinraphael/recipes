@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum URLRecipeType {
+enum URLSearchType {
     // MARK: - Private
     private static let urlString = "https://themealdb.com/api/json/v1/1"
     
